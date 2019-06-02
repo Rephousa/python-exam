@@ -14,7 +14,7 @@ def main():
 
     while(True):
         print("\n What do you want to?:")
-        print("1 - Search in the dataset")
+        print("1 - Search in the dataset") #done
         print("2 - Get all crimes in 5 km distance of given point") #done - needs exporting search result
         print("3 - Add a new record")
         print("4 - Export whole dataset to JSON") #done
@@ -54,12 +54,8 @@ def main():
                     counter += 1
 
             print("Found "+str(counter)+" entries.")
-            
-            wantToExport = input("Do you want to export the search result? (y/n): ")
-
-            if(wantToExport == "Y" or wantToExport == "y"):
-                try:
-                    exportType = input("What type of export? (html/json): ")
+            wantToExport()
+                
 
         if(choice == 2):
             clearResults()
@@ -83,10 +79,10 @@ def main():
                     crimesResult.append(crime)
                     print(crime.printCrime())
                 
-            wantToExport = input("Do you want to export the search result? (y/n): ")
+            wantToExport()
 
-            if(wantToExport == "Y" or wantToExport == "y"):
-                exportToFile("HTML", crimesResult)     
+        if(choice == 3):
+            addNewRecord()
 
         if(choice == 4):
             exportToFile("JSON", crimes)
@@ -190,6 +186,49 @@ def loadCSV():
 def clearResults():
     global crimesResult
     crimesResult = []
+
+def wantToExport():
+    wantToExport = input("Do you want to export the search result? (y/n): ")
+
+    if(wantToExport == "Y" or wantToExport == "y"):
+        while(True):
+            try:
+                exportType = input("What type of export? (html/json): ")
+
+                if(exportType == "html"):
+                    exportToFile("HTML", crimesResult)
+                    break
+                elif(exportType == "JSON"):
+                    exportToFile("JSON", crimesResult)
+                    break
+                else:
+                    print("Input er ikke gyldt, indtast html eller json.")
+            except TypeError:
+                print("Ugyldigt input! Prøv igen.")
+
+def addNewRecord():
+    while(True):
+        print("Enter the data in the following order, each field should be seperated by a comma \",\", if you need to make a comma in the sentence, make a punctation instead")
+        print("Datetime, Address, District, Beat, Grid, Crime Description, UCR_NCIC, Latitude, Longitude:")
+
+        try:
+            addInput = input("Record: ")
+
+            addInputArray = addInput.split(",")
+
+            if(len(addInputArray) == 9):
+                crimes.append(Crime(addInputArray[0],addInputArray[1],addInputArray[2],addInputArray[3],addInputArray[4],addInputArray[5],addInputArray[6],addInputArray[7],addInputArray[8]))
+
+                f = open(FILE_NAME, "a+")
+                f.write("\n"+addInput)
+                f.close()
+                print("Record was added.")
+                break
+            else:
+                print("Input was incorrect, needs 9 parameteres, try again.")
+        except TypeError:
+            print("Try again")
+
 
 if __name__ == "__main__":
     main()
